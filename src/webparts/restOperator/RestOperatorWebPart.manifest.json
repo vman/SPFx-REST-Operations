@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../node_modules/@microsoft/sp-module-interfaces/lib/manifestSchemas/jsonSchemas/clientSideComponentManifestSchema.json",
+
+  "id": "5eb154fb-1ab1-496e-854f-9672dfbc9220",
+  "alias": "RestOperatorWebPart",
+  "componentType": "WebPart",
+  "version": "0.0.1",
+  "manifestVersion": 2,
+
+  "preconfiguredEntries": [{
+    "groupId": "5eb154fb-1ab1-496e-854f-9672dfbc9220",
+    "group": { "default": "Under Development" },
+    "title": { "default": "RESTOperator" },
+    "description": { "default": "RESTOperator description" },
+    "officeFabricIconFontName": "Page",
+    "properties": {
+      "description": "RESTOperator"
+    }
+  }]
+}

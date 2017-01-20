@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "entry": "./lib/webparts/restOperator/RestOperatorWebPart.js",
+      "manifest": "./src/webparts/restOperator/RestOperatorWebPart.manifest.json",
+      "outputPath": "./dist/rest-operator.bundle.js"
+    }
+  ],
+  "externals": {},
+  "localizedResources": {
+    "restOperatorStrings": "webparts/restOperator/loc/{locale}.js"
+  }
+}

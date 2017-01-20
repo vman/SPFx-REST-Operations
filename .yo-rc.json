@@ -1,0 +1,7 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "libraryName": "spfx-rest-operations",
+    "libraryId": "848fb84e-d040-4ed5-8f6f-dc01689eb533",
+    "framework": "none"
+  }
+}
