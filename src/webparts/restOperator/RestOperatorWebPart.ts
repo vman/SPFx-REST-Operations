@@ -58,18 +58,15 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
       // });
 
       const spFlags : ISPHttpClientConfiguration = {
-          defaultSameOriginCredentials: true,
-          defaultODataVersion: ODataVersion.v3,
-          requestDigest: true
+          defaultODataVersion: ODataVersion.v3
       };
 
-      const clientConfigODataV3: SPHttpClientConfiguration  = new SPHttpClientConfiguration(spFlags)
+      const clientConfigODataV3: SPHttpClientConfiguration  = new SPHttpClientConfiguration(spFlags);
 
       spHttpClient.get(`/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
         
-          response.json().then((user: IODataUser) => {
-
-              console.log(user.LoginName);
+          response.json().then((responseJSON: any) => {
+              console.log(responseJSON);
           });
       });
       
