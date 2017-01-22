@@ -10,7 +10,7 @@ import styles from './RestOperator.module.scss';
 import * as strings from 'restOperatorStrings';
 import { IRestOperatorWebPartProps } from './IRestOperatorWebPartProps';
 
-import { SPHttpClient, SPHttpClientConfigurations, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration } from '@microsoft/sp-http';
+import { SPHttpClient, ISPHttpClientBatchCreationOptions, SPHttpClientBatchConfigurations, SPHttpClientBatchConfiguration, SPHttpClientConfigurations, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration, SPHttpClientBatch } from '@microsoft/sp-http';
 import { IODataUser, IODataWeb } from '@microsoft/sp-odata-types';
 
 export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOperatorWebPartProps> {
@@ -57,19 +57,63 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
       //     });
       // });
 
+      // const spFlags : ISPHttpClientConfiguration = {
+      //     defaultODataVersion: ODataVersion.v3
+      // };
+
+      // const clientConfigODataV3: SPHttpClientConfiguration  = new SPHttpClientConfiguration(spFlags);
+
+      // spHttpClient.get(currentWebUrl + `/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
+        
+      //     response.json().then((responseJSON: any) => {
+      //         console.log(responseJSON);
+      //     });
+      // });
+      
+
+      // spHttpClient.get(`/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
+        
+      //     response.json().then((props: any) => {
+
+      //         console.log(props);
+      //     });
+      // });
+
+      const spBatchCreationOpts: ISPHttpClientBatchCreationOptions = { 
+          webUrl: this.context.pageContext.web.absoluteUrl
+       };
+      const spBatch: SPHttpClientBatch =  spHttpClient.beginBatch(spBatchCreationOpts);
+
+      spBatch.get(`/_api/web/currentuser`, SPHttpClientBatchConfigurations.v1).then((response: SPHttpClientResponse) => {
+        
+           response.json().then((user: IODataUser) => {
+
+               console.log(user.LoginName);
+           });
+       });
+
+       spBatch.get(`/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClientBatchConfigurations.v1).then((response: SPHttpClientResponse) => {
+        
+          response.json().then((props: any) => {
+
+              console.log(props);
+          });
+      });
+
       const spFlags : ISPHttpClientConfiguration = {
           defaultODataVersion: ODataVersion.v3
       };
 
-      const clientConfigODataV3: SPHttpClientConfiguration  = new SPHttpClientConfiguration(spFlags);
+      const clientConfigODataV3: SPHttpClientBatchConfiguration  = new SPHttpClientBatchConfiguration(spFlags);
 
-      spHttpClient.get(`/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
+      spBatch.get(currentWebUrl + `/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
         
           response.json().then((responseJSON: any) => {
               console.log(responseJSON);
           });
       });
-      
+
+       spBatch.execute();
   }
 
   protected get dataVersion(): Version {
