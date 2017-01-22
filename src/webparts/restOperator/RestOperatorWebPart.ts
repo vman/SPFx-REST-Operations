@@ -10,8 +10,12 @@ import styles from './RestOperator.module.scss';
 import * as strings from 'restOperatorStrings';
 import { IRestOperatorWebPartProps } from './IRestOperatorWebPartProps';
 
-import { SPHttpClient, ISPHttpClientBatchCreationOptions, SPHttpClientBatchConfigurations, SPHttpClientBatchConfiguration, SPHttpClientConfigurations, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration, SPHttpClientBatch } from '@microsoft/sp-http';
+import { SPHttpClient, SPHttpClientConfigurations, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration } from '@microsoft/sp-http';
 import { IODataUser, IODataWeb } from '@microsoft/sp-odata-types';
+
+
+
+//import { SPHttpClient, SPHttpClientConfigurations, ISPHttpClientOptions, SPHttpClientResponse } from '@microsoft/sp-http';
 
 export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOperatorWebPartProps> {
 
@@ -36,84 +40,53 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
         </div>
       </div>`;
 
-      const spHttpClient: SPHttpClient = this.context.spHttpClient;
-      const currentWebUrl: string = this.context.pageContext.web.absoluteUrl;
+    // Here, 'this' refers to my SPFx webpart which inherits from the BaseClientSideWebPart class.
+    // Since I am calling this method from inside the class, I have access to 'this'.
+    const spHttpClient: SPHttpClient = this.context.spHttpClient;
+    const currentWebUrl: string = this.context.pageContext.web.absoluteUrl;
 
-      // spHttpClient.get(currentWebUrl + `/_api/web`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
-        
-      //     response.json().then((web: IODataWeb) => {
+    //Since the SP Search REST API works with ODataVersion 3, we have to create a new ISPHttpClientConfiguration object with defaultODataVersion = ODataVersion.v3
+    const spSearchConfig: ISPHttpClientConfiguration = {
+      defaultODataVersion: ODataVersion.v3
+    };
 
-      //         console.log(web.Url);
-      //     });
-      // });
+    //Override the default ODataVersion.v4 flag with the ODataVersion.v3
+    const clientConfigODataV3: SPHttpClientConfiguration = SPHttpClientConfigurations.v1.overrideWith(spSearchConfig);
 
-      // const spHttpClient: SPHttpClient = this.context.spHttpClient;
+    //Make the REST call
+    spHttpClient.get(`${currentWebUrl}/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
 
-      // spHttpClient.get(`/_api/web/currentuser`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
-        
-      //     response.json().then((user: IODataUser) => {
-
-      //         console.log(user.LoginName);
-      //     });
-      // });
-
-      // const spFlags : ISPHttpClientConfiguration = {
-      //     defaultODataVersion: ODataVersion.v3
-      // };
-
-      // const clientConfigODataV3: SPHttpClientConfiguration  = new SPHttpClientConfiguration(spFlags);
-
-      // spHttpClient.get(currentWebUrl + `/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
-        
-      //     response.json().then((responseJSON: any) => {
-      //         console.log(responseJSON);
-      //     });
-      // });
-      
-
-      // spHttpClient.get(`/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
-        
-      //     response.json().then((props: any) => {
-
-      //         console.log(props);
-      //     });
-      // });
-
-      const spBatchCreationOpts: ISPHttpClientBatchCreationOptions = { 
-          webUrl: this.context.pageContext.web.absoluteUrl
-       };
-      const spBatch: SPHttpClientBatch =  spHttpClient.beginBatch(spBatchCreationOpts);
-
-      spBatch.get(`/_api/web/currentuser`, SPHttpClientBatchConfigurations.v1).then((response: SPHttpClientResponse) => {
-        
-           response.json().then((user: IODataUser) => {
-
-               console.log(user.LoginName);
-           });
-       });
-
-       spBatch.get(`/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClientBatchConfigurations.v1).then((response: SPHttpClientResponse) => {
-        
-          response.json().then((props: any) => {
-
-              console.log(props);
-          });
+      response.json().then((responseJSON: any) => {
+        console.log(responseJSON);
       });
+    });
 
-      const spFlags : ISPHttpClientConfiguration = {
-          defaultODataVersion: ODataVersion.v3
-      };
+    //GET current web info
+    spHttpClient.get(`${currentWebUrl}/_api/web`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
 
-      const clientConfigODataV3: SPHttpClientBatchConfiguration  = new SPHttpClientBatchConfiguration(spFlags);
+      response.json().then((web: IODataWeb) => {
 
-      spBatch.get(currentWebUrl + `/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
-        
-          response.json().then((responseJSON: any) => {
-              console.log(responseJSON);
-          });
+        console.log(web.Url);
       });
+    });
 
-       spBatch.execute();
+    //GET current user information from the User Information List
+    spHttpClient.get(`${currentWebUrl}/_api/web/currentuser`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
+
+      response.json().then((user: IODataUser) => {
+
+        console.log(user.LoginName);
+      });
+    });
+
+    //GET current user information from the User Profile Service
+    spHttpClient.get(`${currentWebUrl}/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
+
+      response.json().then((userProfileProps: any) => {
+
+        console.log(userProfileProps);
+      });
+    });
   }
 
   protected get dataVersion(): Version {
