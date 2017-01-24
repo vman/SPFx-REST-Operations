@@ -27,7 +27,7 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
             Welcome to the SharePoint Framework!
           </span>
           <p class="${styles.subtitle}">
-            Swithc on the dev console to debug your REST operations.
+            Switch on the dev console to debug your REST operations.
           </p>
           <p class="${styles.description}">
             ${escape(this.properties.description)}
