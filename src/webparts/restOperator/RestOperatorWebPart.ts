@@ -10,7 +10,7 @@ import styles from './RestOperator.module.scss';
 import * as strings from 'restOperatorStrings';
 import { IRestOperatorWebPartProps } from './IRestOperatorWebPartProps';
 
-import { SPHttpClient, SPHttpClientConfigurations, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration } from '@microsoft/sp-http';
+import { SPHttpClient, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration, ISPHttpClientOptions, ISPHttpClientBatchOptions, SPHttpClientBatch, ISPHttpClientBatchCreationOptions } from '@microsoft/sp-http';
 import { IODataUser, IODataWeb } from '@microsoft/sp-odata-types';
 
 
@@ -24,10 +24,10 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
       <div class="${styles.row}">
         <div class="${styles.column}">
           <span class="${styles.title}">
-            Welcome to SharePoint!
+            Welcome to the SharePoint Framework!
           </span>
           <p class="${styles.subtitle}">
-            Customize SharePoint experiences using Web Parts.
+            Swithc on the dev console to debug your REST operations.
           </p>
           <p class="${styles.description}">
             ${escape(this.properties.description)}
@@ -40,6 +40,40 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
         </div>
       </div>`;
 
+    this._makeSPHttpClientGETRequest();
+
+    this._makeSPHttpClientPOSTRequest();
+
+    this._makeSPHttpClientBatchRequest();
+  }
+
+  private _makeSPHttpClientPOSTRequest(): void {
+    // Here, 'this' refers to my SPFx webpart which inherits from the BaseClientSideWebPart class.
+    // Since I am calling this method from inside the class, I have access to 'this'.
+    const spHttpClient: SPHttpClient = this.context.spHttpClient;
+    const currentWebUrl: string = this.context.pageContext.web.absoluteUrl;
+
+    const currentTime: string = new Date().toString();
+    const spOpts: ISPHttpClientOptions = {
+      body: `{ Title: 'Developer Workbench ${currentTime}', BaseTemplate: 100 }`
+    };
+
+
+    spHttpClient.post(`${currentWebUrl}/_api/web/lists`, SPHttpClient.configurations.v1, spOpts)
+      .then((response: SPHttpClientResponse) => {
+        // Access properties of the response object. 
+        console.log(`Status code: ${response.status}`);
+        console.log(`Status text: ${response.statusText}`);
+
+        //response.json() returns a promise so you get access to the json in the resolve callback.
+        response.json().then((responseJSON: JSON) => {
+          console.log(responseJSON);
+        });
+      });
+  }
+
+  private _makeSPHttpClientGETRequest(): void {
+
     // Here, 'this' refers to my SPFx webpart which inherits from the BaseClientSideWebPart class.
     // Since I am calling this method from inside the class, I have access to 'this'.
     const spHttpClient: SPHttpClient = this.context.spHttpClient;
@@ -51,7 +85,7 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
     };
 
     //Override the default ODataVersion.v4 flag with the ODataVersion.v3
-    const clientConfigODataV3: SPHttpClientConfiguration = SPHttpClientConfigurations.v1.overrideWith(spSearchConfig);
+    const clientConfigODataV3: SPHttpClientConfiguration = SPHttpClient.configurations.v1.overrideWith(spSearchConfig);
 
     //Make the REST call
     spHttpClient.get(`${currentWebUrl}/_api/search/query?querytext='sharepoint'`, clientConfigODataV3).then((response: SPHttpClientResponse) => {
@@ -62,7 +96,7 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
     });
 
     //GET current web info
-    spHttpClient.get(`${currentWebUrl}/_api/web`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
+    spHttpClient.get(`${currentWebUrl}/_api/web`, SPHttpClient.configurations.v1).then((response: SPHttpClientResponse) => {
 
       response.json().then((web: IODataWeb) => {
 
@@ -71,7 +105,7 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
     });
 
     //GET current user information from the User Information List
-    spHttpClient.get(`${currentWebUrl}/_api/web/currentuser`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
+    spHttpClient.get(`${currentWebUrl}/_api/web/currentuser`, SPHttpClient.configurations.v1).then((response: SPHttpClientResponse) => {
 
       response.json().then((user: IODataUser) => {
 
@@ -80,11 +114,63 @@ export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOper
     });
 
     //GET current user information from the User Profile Service
-    spHttpClient.get(`${currentWebUrl}/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClientConfigurations.v1).then((response: SPHttpClientResponse) => {
+    spHttpClient.get(`${currentWebUrl}/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClient.configurations.v1).then((response: SPHttpClientResponse) => {
 
       response.json().then((userProfileProps: any) => {
 
         console.log(userProfileProps);
+      });
+    });
+
+  }
+
+  private _makeSPHttpClientBatchRequest(): void {
+
+    // Here, 'this' refers to my SPFx webpart which inherits from the BaseClientSideWebPart class.
+    // Since I am calling this method from inside the class, I have access to 'this'.
+    const spHttpClient: SPHttpClient = this.context.spHttpClient;
+    const currentWebUrl: string = this.context.pageContext.web.absoluteUrl;
+
+    const spBatchCreationOpts: ISPHttpClientBatchCreationOptions = { webUrl: currentWebUrl };
+
+    const spBatch: SPHttpClientBatch = spHttpClient.beginBatch(spBatchCreationOpts);
+
+    // Queue a request to get current user's userprofile properties
+    const getMyProperties: Promise<SPHttpClientResponse> = spBatch.get(`${currentWebUrl}/_api/SP.UserProfiles.PeopleManager/GetMyProperties`, SPHttpClientBatch.configurations.v1);
+
+    // Queue a request to get the title of the current web
+    const getWebTitle: Promise<SPHttpClientResponse> = spBatch.get(`${currentWebUrl}/_api/web/title`, SPHttpClientBatch.configurations.v1);
+
+    // Queue a request to create a list in the current web.
+    const currentTime: string = new Date().toString();
+    const batchOps: ISPHttpClientBatchOptions = {
+      body: `{ Title: 'List created with SPFx batching at ${currentTime}', BaseTemplate: 100 }`
+    };
+    const createList: Promise<SPHttpClientResponse> = spBatch.post(`${currentWebUrl}/_api/web/lists`, SPHttpClientBatch.configurations.v1, batchOps);
+
+
+    spBatch.execute().then(() => {
+
+      getMyProperties.then((response: SPHttpClientResponse) => {
+        response.json().then((props: any) => {
+          console.log(props);
+        });
+      });
+
+      getWebTitle.then((response: SPHttpClientResponse) => {
+
+        response.json().then((webTitle: string) => {
+
+          console.log(webTitle);
+        });
+      });
+
+      createList.then((response: SPHttpClientResponse) => {
+
+        response.json().then((responseJSON: any) => {
+
+          console.log(responseJSON);
+        });
       });
     });
   }
