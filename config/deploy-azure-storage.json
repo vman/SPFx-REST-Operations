@@ -1,6 +1,6 @@
 {
   "workingDir": "./temp/deploy/",
   "account": "<!-- STORAGE ACCOUNT NAME -->",
-  "container": "spfx-rest-operations",
+  "container": "sp-fx-rest-operations",
   "accessKey": "<!-- ACCESS KEY -->"
 }

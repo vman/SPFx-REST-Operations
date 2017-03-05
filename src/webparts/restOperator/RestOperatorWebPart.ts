@@ -13,30 +13,22 @@ import { IRestOperatorWebPartProps } from './IRestOperatorWebPartProps';
 import { SPHttpClient, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration, ISPHttpClientOptions, ISPHttpClientBatchOptions, SPHttpClientBatch, ISPHttpClientBatchCreationOptions } from '@microsoft/sp-http';
 import { IODataUser, IODataWeb } from '@microsoft/sp-odata-types';
 
-
-
-//import { SPHttpClient, SPHttpClientConfigurations, ISPHttpClientOptions, SPHttpClientResponse } from '@microsoft/sp-http';
-
 export default class RestOperatorWebPart extends BaseClientSideWebPart<IRestOperatorWebPartProps> {
 
   public render(): void {
     this.domElement.innerHTML = `
-      <div class="${styles.row}">
-        <div class="${styles.column}">
-          <span class="${styles.title}">
-            Welcome to the SharePoint Framework!
-          </span>
-          <p class="${styles.subtitle}">
-            Switch on the dev console to debug your REST operations.
-          </p>
-          <p class="${styles.description}">
-            ${escape(this.properties.description)}
-          </p>
-          <a class="ms-Button ${styles.button}" href="https://github.com/SharePoint/sp-dev-docs/wiki">
-            <span class="ms-Button-label">
-              Learn more
-            </span>
-          </a>
+      <div class="${styles.helloWorld}">
+        <div class="${styles.container}">
+          <div class="ms-Grid-row ms-bgColor-themeDark ms-fontColor-white ${styles.row}">
+            <div class="ms-Grid-col ms-u-lg10 ms-u-xl8 ms-u-xlPush2 ms-u-lgPush1">
+              <span class="ms-font-xl ms-fontColor-white">Welcome to SharePoint!</span>
+              <p class="ms-font-l ms-fontColor-white">Customize SharePoint experiences using Web Parts.</p>
+              <p class="ms-font-l ms-fontColor-white">${escape(this.properties.description)}</p>
+              <a href="https://aka.ms/spfx" class="${styles.button}">
+                <span class="${styles.label}">Learn more</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>`;
 
