@@ -1,26 +1,17 @@
-## sp-fx-rest-operations
+# spfx-rest-operations
 
-This is where you include your WebPart documentation.
+## Samples for making REST API operations: 
 
-### Building the code
+1) GET requests to the Web, User Profile Service and Search REST APIs
+2) POST request to the Lists REST API
+3) Batch request (including calls to User Profile, Web and Lists) to the $batch REST API 
 
-```bash
-git clone the repo
-npm i
-npm i -g gulp
-gulp
-```
+## More information:
 
-This package produces the following:
+[Working with the REST API in SharePoint Framework (SPFx)](http://www.vrdmn.com/2017/01/working-with-rest-api-in-sharepoint.html)
 
-* lib/* - intermediate-stage commonjs build artifacts
-* dist/* - the bundled script, along with other resources
-* deploy/* - all resources which should be uploaded to a CDN.
+[Making a POST request to SharePoint from an SPFx webpart](http://www.vrdmn.com/2016/08/making-post-request-to-sharepoint-from.html)
 
-### Build options
+[Batch REST requests in SharePoint Framework (SPFx) using SPHttpClientBatch](http://www.vrdmn.com/2016/08/batch-rest-requests-in-spfx-using.html)
 
-gulp clean - TODO
-gulp test - TODO
-gulp serve - TODO
-gulp bundle - TODO
-gulp package-solution - TODO
+
