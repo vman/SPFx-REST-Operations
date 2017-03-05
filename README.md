@@ -2,9 +2,9 @@
 
 ## Samples for making REST API operations: 
 
-1) GET requests to the Web, User Profile Service and Search REST APIs
-2) POST request to the Lists REST API
-3) Batch request (including calls to User Profile, Web and Lists) to the $batch REST API 
+1. GET requests to the Web, User Profile Service and Search REST APIs
+2. POST request to the Lists REST API
+3. Batch request (including calls to User Profile, Web and Lists) to the $batch REST API 
 
 ## More information:
 
